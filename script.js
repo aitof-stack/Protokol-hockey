@@ -65,7 +65,8 @@ const protocolTemplate = {
     referees: { main1: '', main2: '', notes: '' },
     isRunning: false,
     timerInterval: null,
-    logo: null
+    logo: null,
+    situation: '' // Текущая игровая ситуация
 };
 
 // Текущие глобальные переменные
@@ -80,9 +81,36 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM загружен, инициализация протокола...');
     initProtocol();
     
+    // Устанавливаем текущую дату
+    setCurrentDate();
+    
     // Инициализация обработчиков для модальных окон
     initModalHandlers();
 });
+
+function setCurrentDate() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('matchDate');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = today;
+    }
+    
+    // Устанавливаем текущее время
+    const now = new Date();
+    const timeInput = document.getElementById('matchTime');
+    if (timeInput && !timeInput.value) {
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        timeInput.value = `${hours}:${minutes}`;
+    }
+    
+    // Устанавливаем дату подписания
+    const signDate = document.getElementById('signDate');
+    if (signDate && !signDate.value) {
+        const formattedDate = now.toLocaleDateString('ru-RU');
+        signDate.value = formattedDate;
+    }
+}
 
 function initModalHandlers() {
     console.log('🔧 Инициализация обработчиков модальных окон...');
@@ -158,11 +186,13 @@ function initEventListeners() {
                     document.getElementById('teamAName').textContent = name;
                     document.getElementById('liveTeamA').textContent = name;
                     document.getElementById('statsTeamATitle').textContent = name;
+                    document.getElementById('shootoutTeamAName').textContent = name;
                 } else if (fieldId === 'teamB') {
                     const name = this.value || 'Команда Б';
                     document.getElementById('teamBName').textContent = name;
                     document.getElementById('liveTeamB').textContent = name;
                     document.getElementById('statsTeamBTitle').textContent = name;
+                    document.getElementById('shootoutTeamBName').textContent = name;
                 }
                 
                 setTimeout(saveCurrentProtocol, 100);
@@ -370,6 +400,9 @@ function loadProtocol(index) {
     updateGoalieDisplay('B', protocol);
     updateLiveTeamNames(protocol);
     updatePenaltiesDisplayOnScoreboard(protocol);
+    
+    // Обновляем игровую ситуацию
+    updateGameSituationDisplay();
 }
 
 // Сохранение текущего протокола
@@ -453,7 +486,7 @@ function saveAllProtocols() {
     
     try {
         localStorage.setItem('hockeyProtocols', JSON.stringify(allProtocols));
-        localStorage.setItem('currentProtocolIndex', currentProtocolIndex);
+        localStorage.setItem('currentProtocolIndex', currentProtocolIndex.toString());
         
         const logoImage = document.getElementById('logoImage');
         if (logoImage && logoImage.src) {
@@ -584,7 +617,7 @@ function updateGameSituationDisplay(team) {
     if (allProtocols.length === 0) return;
     const protocol = allProtocols[currentProtocolIndex];
     
-    const situation = getGameSituation(protocol, team);
+    const situation = getGameSituation(protocol, team || 'A');
     const situationText = getSituationDescription(situation);
     
     const display = document.getElementById('currentSituationText');
@@ -596,6 +629,9 @@ function updateGameSituationDisplay(team) {
     if (select) {
         select.value = situation;
     }
+    
+    // Сохраняем текущую ситуацию в протокол
+    protocol.situation = situationText;
 }
 
 function getSituationDescription(code) {
@@ -1052,11 +1088,14 @@ function updateProtocolResults(protocol) {
     const p1Score = document.getElementById('p1Score');
     const p2Score = document.getElementById('p2Score');
     const p3Score = document.getElementById('p3Score');
+    const otScore = document.getElementById('otScore');
+    const soScore = document.getElementById('soScore');
     const p1Penalty = document.getElementById('p1Penalty');
     const p2Penalty = document.getElementById('p2Penalty');
     const p3Penalty = document.getElementById('p3Penalty');
+    const otPenalty = document.getElementById('otPenalty');
+    const soPenalty = document.getElementById('soPenalty');
     const totalScore = document.getElementById('totalScore');
-    const soScore = document.getElementById('soScore');
     
     if (p1Score) p1Score.value = `${protocol.periodStats[1].scoreA}:${protocol.periodStats[1].scoreB}`;
     if (p2Score) p2Score.value = `${protocol.periodStats[2].scoreA}:${protocol.periodStats[2].scoreB}`;
@@ -1548,7 +1587,7 @@ function processCSV(team) {
 }
 
 // ==============================
-// ГОЛЫ И ШТРАФЫ (С ПРЕКРАЩЕНИЕМ ШТРАФОВ ПРИ ГОЛЕ) - ИСПРАВЛЕНАЯ ВЕРСИЯ
+// ГОЛЫ И ШТРАФЫ (С ПРЕКРАЩЕНИЕМ ШТРАФОВ ПРИ ГОЛЕ) - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================
 
 function showGoalDialog(team) {
@@ -2187,6 +2226,25 @@ function uploadLogo(event) {
     reader.readAsDataURL(file);
 }
 
+function exportCurrentProtocol() {
+    if (allProtocols.length === 0) return;
+    
+    saveCurrentProtocol();
+    const protocol = allProtocols[currentProtocolIndex];
+    
+    const dataStr = JSON.stringify(protocol, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `протокол_матча_${protocol.matchNumber}_${protocol.matchDate}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    alert(`Протокол №${protocol.matchNumber} экспортирован`);
+}
+
 function exportPDF() {
     if (allProtocols.length === 0) {
         alert('Нет активного протокола');
@@ -2261,6 +2319,7 @@ function openStatistics() {
     
     // Сохраняем в localStorage для страницы статистики
     localStorage.setItem('hockeyProtocols', JSON.stringify(allProtocols));
+    localStorage.setItem('currentProtocolIndex', currentProtocolIndex.toString());
     
     // Открываем страницу статистики в новой вкладке
     const statsWindow = window.open('statistics.html', '_blank');
@@ -2271,11 +2330,28 @@ function openStatistics() {
         setTimeout(() => {
             try {
                 statsWindow.postMessage(protocolsData, '*');
-                console.log('Данные протоколов отправлены в окно статистики');
+                console.log('✅ Данные протоколов отправлены в окно статистики');
             } catch (e) {
-                console.error('Ошибка отправки данных:', e);
+                console.error('❌ Ошибка отправки данных:', e);
             }
-        }, 500);
+        }, 1000);
+    }
+}
+
+function showFileManagementMenu() {
+    alert('Меню управления файлами будет реализовано в следующей версии');
+}
+
+function restoreFromBackup() {
+    const backup = localStorage.getItem('hockeyProtocols_backup');
+    if (!backup) {
+        alert('Резервная копия не найдена');
+        return;
+    }
+    
+    if (confirm('Восстановить данные из резервной копии? Текущие данные будут заменены.')) {
+        localStorage.setItem('hockeyProtocols', backup);
+        alert('Данные восстановлены! Перезагрузите страницу.');
     }
 }
 
