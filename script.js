@@ -1587,6 +1587,244 @@ function processCSV(team) {
 }
 
 // ==============================
+// УПРАВЛЕНИЕ ФАЙЛАМИ
+// ==============================
+
+function showFileManagementMenu() {
+    // Создаем модальное окно для управления файлами
+    const modalId = 'fileManagementModal';
+    let modal = document.getElementById(modalId);
+    
+    if (!modal) {
+        // Создаем модальное окно
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <h3><i class="fas fa-folder-open"></i> Управление файлами</h3>
+                
+                <div class="file-management-grid">
+                    <button class="file-management-btn export" onclick="exportAllProtocols()">
+                        <div class="icon"><i class="fas fa-file-export"></i></div>
+                        <div class="text">Экспорт всех протоколов</div>
+                        <small>Скачать все протоколы в JSON</small>
+                    </button>
+                    
+                    <button class="file-management-btn import" onclick="importAllProtocols()">
+                        <div class="icon"><i class="fas fa-file-import"></i></div>
+                        <div class="text">Импорт протоколов</div>
+                        <small>Загрузить протоколы из файла</small>
+                    </button>
+                    
+                    <button class="file-management-btn backup" onclick="createBackup()">
+                        <div class="icon"><i class="fas fa-save"></i></div>
+                        <div class="text">Создать резервную копию</div>
+                        <small>Сохранить все данные локально</small>
+                    </button>
+                    
+                    <button class="file-management-btn merge" onclick="mergeProtocols()">
+                        <div class="icon"><i class="fas fa-code-merge"></i></div>
+                        <div class="text">Объединить протоколы</div>
+                        <small>Слить несколько файлов в один</small>
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4><i class="fas fa-info-circle"></i> Информация</h4>
+                    <p style="font-size: 12px; color: #666; margin: 8px 0;">
+                        <strong>Текущие данные:</strong><br>
+                        • Протоколов: <span id="fileInfoCount">${allProtocols.length}</span><br>
+                        • Последнее сохранение: <span id="fileInfoTime">${new Date().toLocaleString('ru-RU')}</span>
+                    </p>
+                </div>
+                
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button onclick="closeModal('${modalId}')" class="btn-cancel">
+                        <i class="fas fa-times"></i> Закрыть
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Обновляем информацию
+    document.getElementById('fileInfoCount').textContent = allProtocols.length;
+    document.getElementById('fileInfoTime').textContent = new Date().toLocaleString('ru-RU');
+    
+    // Показываем модальное окно
+    modal.style.display = 'flex';
+}
+
+function exportAllProtocols() {
+    if (allProtocols.length === 0) {
+        alert('Нет протоколов для экспорта');
+        return;
+    }
+    
+    saveCurrentProtocol();
+    
+    const exportData = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        protocols: allProtocols,
+        currentProtocolIndex: currentProtocolIndex,
+        totalProtocols: allProtocols.length
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `hockey_protocols_${new Date().toISOString().slice(0,10)}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    alert(`Экспортировано ${allProtocols.length} протоколов`);
+}
+
+function importAllProtocols() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.style.display = 'none';
+    
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importData = JSON.parse(e.target.result);
+                
+                if (!importData.protocols || !Array.isArray(importData.protocols)) {
+                    alert('Неверный формат файла. Ожидается JSON с протоколами');
+                    return;
+                }
+                
+                if (confirm(`Импортировать ${importData.protocols.length} протоколов? Текущие протоколы будут заменены.`)) {
+                    allProtocols = importData.protocols;
+                    currentProtocolIndex = 0;
+                    
+                    // Сохраняем в localStorage
+                    localStorage.setItem('hockeyProtocols', JSON.stringify(allProtocols));
+                    localStorage.setItem('currentProtocolIndex', currentProtocolIndex.toString());
+                    
+                    // Загружаем первый протокол
+                    loadProtocol(currentProtocolIndex);
+                    updateProtocolCounter();
+                    
+                    alert(`✅ Импортировано ${allProtocols.length} протоколов`);
+                    closeModal('fileManagementModal');
+                }
+            } catch (error) {
+                alert('Ошибка чтения файла: ' + error.message);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+}
+
+function createBackup() {
+    if (allProtocols.length === 0) {
+        alert('Нет протоколов для резервного копирования');
+        return;
+    }
+    
+    saveCurrentProtocol();
+    
+    // Создаем резервную копию в localStorage
+    localStorage.setItem('hockeyProtocols_backup', JSON.stringify(allProtocols));
+    localStorage.setItem('hockeyProtocols_backup_date', new Date().toISOString());
+    
+    // Также создаем резервную копию логотипа
+    const logoImage = document.getElementById('logoImage');
+    if (logoImage && logoImage.src) {
+        localStorage.setItem('hockeyLogo_backup', logoImage.src);
+    }
+    
+    alert(`✅ Создана резервная копия ${allProtocols.length} протоколов\nДата: ${new Date().toLocaleString('ru-RU')}`);
+}
+
+function mergeProtocols() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.multiple = true;
+    input.style.display = 'none';
+    
+    input.onchange = function(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        
+        let totalImported = 0;
+        let failedFiles = 0;
+        
+        // Функция для обработки каждого файла
+        const processFile = (file, index) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importData = JSON.parse(e.target.result);
+                        
+                        if (importData.protocols && Array.isArray(importData.protocols)) {
+                            // Добавляем протоколы с новыми ID
+                            importData.protocols.forEach(protocol => {
+                                const newProtocol = JSON.parse(JSON.stringify(protocol));
+                                newProtocol.id = allProtocols.length;
+                                allProtocols.push(newProtocol);
+                                totalImported++;
+                            });
+                        }
+                        resolve(true);
+                    } catch (error) {
+                        console.error(`Ошибка в файле ${file.name}:`, error);
+                        failedFiles++;
+                        resolve(false);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        };
+        
+        // Обрабатываем все файлы последовательно
+        const processAllFiles = async () => {
+            for (let i = 0; i < files.length; i++) {
+                await processFile(files[i], i);
+            }
+            
+            // Сохраняем объединенные протоколы
+            localStorage.setItem('hockeyProtocols', JSON.stringify(allProtocols));
+            currentProtocolIndex = allProtocols.length - 1;
+            localStorage.setItem('currentProtocolIndex', currentProtocolIndex.toString());
+            
+            // Обновляем интерфейс
+            loadProtocol(currentProtocolIndex);
+            updateProtocolCounter();
+            
+            alert(`✅ Объединение завершено:\n• Успешно: ${totalImported} протоколов\n• Ошибок: ${failedFiles} файлов\n• Всего протоколов: ${allProtocols.length}`);
+            closeModal('fileManagementModal');
+        };
+        
+        processAllFiles();
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+}
+
+// ==============================
 // ГОЛЫ И ШТРАФЫ (С ПРЕКРАЩЕНИЕМ ШТРАФОВ ПРИ ГОЛЕ) - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================
 
