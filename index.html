@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Протокол хоккейного матча</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Панель управления -->
+    <div class="toolbar">
+        <div class="toolbar-group protocol-navigation">
+            <button onclick="previousProtocol()" class="nav-btn" title="Предыдущий протокол">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="protocol-counter">
+                <span id="currentProtocolNum">1</span>/<span id="totalProtocols">1</span>
+            </span>
+            <button onclick="nextProtocol()" class="nav-btn" title="Следующий протокол">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-group">
+            <button onclick="newProtocol()" class="btn btn-new-protocol" title="Новый протокол">
+                <i class="fas fa-plus"></i> Новый
+            </button>
+            <button onclick="duplicateProtocol()" class="btn btn-duplicate" title="Копировать протокол">
+                <i class="fas fa-copy"></i> Копия
+            </button>
+            <button onclick="deleteProtocol()" class="btn btn-delete" title="Удалить протокол">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-group">
+            <input type="text" id="matchNumber" placeholder="№ матча" title="Номер матча">
+            <input type="date" id="matchDate" title="Дата матча">
+            <input type="time" id="matchTime" title="Время матча">
+        </div>
+        
+        <div class="toolbar-group">
+            <label class="btn btn-import" title="Загрузить логотип">
+                <i class="fas fa-image"></i> Лого
+                <input type="file" id="logoUpload" accept="image/*" style="display: none;" onchange="uploadLogo(event)">
+            </label>
+            <button onclick="importCSV()" class="btn btn-import" title="Импорт составов команд">
+                <i class="fas fa-file-import"></i> Составы
+            </button>
+            <button onclick="toggleLiveMode()" class="btn btn-live" id="liveModeBtn" title="Режим матча">
+                <i class="fas fa-play"></i> Матч
+            </button>
+        </div>
+        
+        <div class="toolbar-group">
+            <button onclick="showFileManagementMenu()" class="btn btn-import-file" title="Управление файлами">
+                <i class="fas fa-folder-open"></i> Файлы
+            </button>
+            <button onclick="exportCurrentProtocol()" class="btn btn-export-file" title="Экспорт текущего протокола">
+                <i class="fas fa-save"></i> Экспорт
+            </button>
+            <button onclick="exportPDF()" class="btn btn-export" title="Экспорт в PDF">
+                <i class="fas fa-file-pdf"></i> PDF
+            </button>
+        </div>
+        
+        <div class="toolbar-group">
+            <button onclick="openStatistics()" class="btn btn-statistics" title="Статистика">
+                <i class="fas fa-chart-bar"></i> Статистика
+            </button>
+            <button onclick="saveAllProtocols()" class="btn btn-save" title="Сохранить все">
+                <i class="fas fa-save"></i> Сохранить
+            </button>
+            <button onclick="restoreFromBackup()" class="btn btn-backup" title="Восстановить из резервной копии">
+                <i class="fas fa-history"></i> Восстановить
+            </button>
+        </div>
+    </div>
+
+    <!-- Панель живого матча -->
+    <div id="livePanel" class="live-panel" style="display: none;">
+        <!-- Scoreboard -->
+        <div class="scoreboard">
+            <div class="team-score">
+                <h2 id="liveTeamA">Команда А</h2>
+                <div class="score" id="scoreA">0</div>
+            </div>
+            
+            <div class="timer-section">
+                <div class="period">Период: <span id="currentPeriod">1</span></div>
+                <div class="timer" id="gameTimer">15:00</div>
+                <div class="timer-controls">
+                    <button onclick="startTimer()" id="startBtn" title="Старт">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button onclick="pauseTimer()" id="pauseBtn" title="Пауза">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button onclick="resetTimer()" title="Сброс">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button onclick="nextPeriod()" title="Следующий период">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="team-score">
+                <h2 id="liveTeamB">Команда Б</h2>
+                <div class="score" id="scoreB">0</div>
+            </div>
+        </div>
+
+        <!-- Активные штрафы -->
+        <div class="active-penalties-panel">
+            <h3><i class="fas fa-exclamation-triangle"></i> Текущие удаления</h3>
+            <div class="penalties-container">
+                <div class="penalty-team">
+                    <h4 id="activePenaltiesTeamA">Команда А: 0</h4>
+                    <div id="activePenaltiesListA" class="penalty-list"></div>
+                </div>
+                <div class="penalty-team">
+                    <h4 id="activePenaltiesTeamB">Команда Б: 0</h4>
+                    <div id="activePenaltiesListB" class="penalty-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель действий -->
+        <div class="action-panel">
+            <button onclick="showPenaltyShotDialog('A')" class="action-btn penalty-shot-btn" title="Буллит команды А">
+                <i class="fas fa-crosshairs"></i> Буллит А
+            </button>
+            <button onclick="showPenaltyDialog('A')" class="action-btn penalty-btn" title="Штраф команды А">
+                <i class="fas fa-exclamation-circle"></i> Штраф А
+            </button>
+            <button onclick="showGoalDialog('A')" class="action-btn goal-btn-a" title="Гол команды А">
+                <i class="fas fa-hockey-puck"></i> Гол А
+            </button>
+            <button onclick="showGoalDialog('B')" class="action-btn goal-btn-b" title="Гол команды Б">
+                <i class="fas fa-hockey-puck"></i> Гол Б
+            </button>
+            <button onclick="showPenaltyDialog('B')" class="action-btn penalty-btn" title="Штраф команды Б">
+                <i class="fas fa-exclamation-circle"></i> Штраф Б
+            </button>
+            <button onclick="showPenaltyShotDialog('B')" class="action-btn penalty-shot-btn" title="Буллит команды Б">
+                <i class="fas fa-crosshairs"></i> Буллит Б
+            </button>
+        </div>
+
+        <!-- Вратари -->
+        <div class="goalies-panel">
+            <div class="goalie-control">
+                <h4><i class="fas fa-shield-alt"></i> Вратарь команды А</h4>
+                <div class="goalie-info">
+                    <select id="activeGoalieA" onchange="changeGoalie('A')">
+                        <option value="">Выберите вратаря</option>
+                    </select>
+                    <div class="goalie-stats-live">
+                        <span>Сейвы: <strong id="savesA">0</strong></span>
+                        <span>Пропущено: <strong id="goalsAgainstA">0</strong></span>
+                        <span>Время: <strong id="timeOnIceA">00:00</strong></span>
+                    </div>
+                </div>
+                <button onclick="registerSave('A')" class="save-btn" title="Зарегистрировать сейв">
+                    <i class="fas fa-hands"></i> Сейв
+                </button>
+            </div>
+            
+            <div class="goalie-control">
+                <h4><i class="fas fa-shield-alt"></i> Вратарь команды Б</h4>
+                <div class="goalie-info">
+                    <select id="activeGoalieB" onchange="changeGoalie('B')">
+                        <option value="">Выберите вратаря</option>
+                    </select>
+                    <div class="goalie-stats-live">
+                        <span>Сейвы: <strong id="savesB">0</strong></span>
+                        <span>Пропущено: <strong id="goalsAgainstB">0</strong></span>
+                        <span>Время: <strong id="timeOnIceB">00:00</strong></span>
+                    </div>
+                </div>
+                <button onclick="registerSave('B')" class="save-btn" title="Зарегистрировать сейв">
+                    <i class="fas fa-hands"></i> Сейв
+                </button>
+            </div>
+        </div>
+
+        <!-- Лог событий -->
+        <div class="events-log">
+            <h3><i class="fas fa-history"></i> События матча</h3>
+            <div id="eventsLog"></div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="goalDialog" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-hockey-puck"></i> Регистрация гола</h3>
+            <div class="situation-display">
+                <strong>Текущая ситуация:</strong> <span id="currentSituationText">Равные составы</span>
+            </div>
+            <label>Автор гола:</label>
+            <select id="goalScorer"></select>
+            
+            <label>Ассистент 1:</label>
+            <select id="assist1">
+                <option value="">Нет</option>
+            </select>
+            
+            <label>Ассистент 2:</label>
+            <select id="assist2">
+                <option value="">Нет</option>
+            </select>
+            
+            <label>Игровая ситуация:</label>
+            <select id="gameSituation">
+                <option value="">Равные составы</option>
+                <option value="+1">+1 (Большинство 5 на 4, 4 на 3)</option>
+                <option value="+2">+2 (Большинство 5 на 3)</option>
+                <option value="-1">-1 (Меньшинство 4 на 5, 3 на 4)</option>
+                <option value="-2">-2 (Меньшинство 3 на 5)</option>
+                <option value="ПВ">ПВ (Пустые ворота)</option>
+                <option value="ШБ">ШБ (Штрафной бросок)</option>
+            </select>
+            
+            <div class="modal-buttons">
+                <button onclick="confirmGoal()" class="btn-confirm">
+                    <i class="fas fa-check"></i> Подтвердить
+                </button>
+                <button onclick="closeModal('goalDialog')" class="btn-cancel">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="penaltyDialog" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-circle"></i> Регистрация штрафа</h3>
+            <label>Игрок:</label>
+            <select id="penaltyPlayer"></select>
+            
+            <label>Время штрафа:</label>
+            <select id="penaltyMinutes">
+                <option value="2">2 минуты (Малый)</option>
+                <option value="4">2+2 минуты (Двойной малый)</option>
+                <option value="5">5 минут (Большой)</option>
+                <option value="10">10 минут (Дисциплинарный)</option>
+                <option value="20">До конца игры (Матч)</option>
+            </select>
+            
+            <label>Нарушение:</label>
+            <input type="text" id="penaltyReason" placeholder="Например: Задержка клюшкой">
+            
+            <div class="modal-buttons">
+                <button onclick="confirmPenalty()" class="btn-confirm">
+                    <i class="fas fa-check"></i> Подтвердить
+                </button>
+                <button onclick="closeModal('penaltyDialog')" class="btn-cancel">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="penaltyShotDialog" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-crosshairs"></i> Буллит (Штрафной бросок)</h3>
+            <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                Назначается за сорванный выход один на один. Время останавливается.
+            </p>
+            
+            <label>Игрок, выполняющий буллит:</label>
+            <select id="penaltyShotPlayer"></select>
+            
+            <label>Вратарь соперника:</label>
+            <select id="penaltyShotGoalie"></select>
+            
+            <div class="modal-buttons">
+                <button onclick="executePenaltyShot(true)" class="btn-confirm">
+                    <i class="fas fa-check"></i> Гол
+                </button>
+                <button onclick="executePenaltyShot(false)" class="btn-cancel">
+                    <i class="fas fa-times"></i> Промах
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shootoutModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-trophy"></i> Серия послематчевых бросков</h3>
+            <div class="shootout-score">
+                <div class="shootout-team">
+                    <h4 id="shootoutTeamAName">Команда А</h4>
+                    <div class="shootout-score-num" id="shootoutScoreA">0</div>
+                </div>
+                
+                <div class="shootout-info">
+                    <div>Бросок: <span id="shootoutRoundNum">1</span></div>
+                    <div id="shootoutPhase">Основная серия (по 3 броска)</div>
+                    <div>Бросает: Команда <span id="shootoutCurrentTeam">А</span></div>
+                </div>
+                
+                <div class="shootout-team">
+                    <h4 id="shootoutTeamBName">Команда Б</h4>
+                    <div class="shootout-score-num" id="shootoutScoreB">0</div>
+                </div>
+            </div>
+            
+            <div class="shootout-buttons">
+                <button onclick="shootoutGoal('A')" class="btn-shootout goal">
+                    <i class="fas fa-hockey-puck"></i> Гол команды А
+                </button>
+                <button onclick="shootoutMiss('A')" class="btn-shootout miss">
+                    <i class="fas fa-times"></i> Промах команды А
+                </button>
+                <button onclick="shootoutGoal('B')" class="btn-shootout goal">
+                    <i class="fas fa-hockey-puck"></i> Гол команды Б
+                </button>
+                <button onclick="shootoutMiss('B')" class="btn-shootout miss">
+                    <i class="fas fa-times"></i> Промах команды Б
+                </button>
+            </div>
+            
+            <button onclick="finishShootout()" class="btn-finish-shootout">
+                <i class="fas fa-flag-checkered"></i> Завершить буллиты
+            </button>
+        </div>
+    </div>
+
+    <!-- Основной протокол -->
+    <div id="protocol" class="protocol">
+        <!-- Заголовок -->
+        <div class="header">
+            <div class="logo" id="logoContainer">
+                <img id="logoImage" src="" alt="Логотип" style="display: none;">
+                <span id="logoEmoji">🏒</span>
+            </div>
+            
+            <div class="header-center">
+                <h1>ПРОТОКОЛ МАТЧА</h1>
+                <div class="tournament-type">Регулярный турнир 5х5</div>
+            </div>
+            
+            <div class="match-info">
+                <span>№ Матча: <strong id="displayMatchNumber">___</strong></span><br>
+                <span>Дата: <strong id="displayDate">___</strong></span><br>
+                <span>Время: <strong id="displayTime">___</strong></span>
+            </div>
+        </div>
+
+        <!-- Основные данные матча -->
+        <div class="match-details">
+            <div class="detail-row">
+                <span>Соревнование: <input type="text" id="competition" placeholder="Название турнира"></span>
+                <span>Город: <input type="text" id="city" placeholder="Город"></span>
+                <span>Арена: <input type="text" id="arena" placeholder="Название арены"></span>
+            </div>
+            
+            <div class="detail-row">
+                <span>Команда (А): <input type="text" id="teamA" placeholder="Команда А"></span>
+                <span>Команда (Б): <input type="text" id="teamB" placeholder="Команда Б"></span>
+                <span>Зрители: <input type="number" id="spectators" placeholder="0"></span>
+            </div>
+        </div>
+
+        <!-- Команда А -->
+        <div class="team-section">
+            <div class="team-header team-a-header">
+                <span>Команда (А)</span>
+                <span id="teamAName">КОМАНДА "А"</span>
+            </div>
+            
+            <table class="roster-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">№</th>
+                        <th rowspan="2">Фамилия Имя</th>
+                        <th rowspan="2">К/А</th>
+                        <th rowspan="2">Поз</th>
+                        <th rowspan="2">Игр</th>
+                        <th colspan="6">Взятие ворот</th>
+                        <th colspan="6">Удаления</th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Время</th>
+                        <th>Г</th>
+                        <th>А1</th>
+                        <th>А2</th>
+                        <th>И/С</th>
+                        <th>Время</th>
+                        <th>№</th>
+                        <th>Мин</th>
+                        <th>Нарушение</th>
+                        <th>Нач</th>
+                        <th>Окон</th>
+                    </tr>
+                </thead>
+                <tbody id="teamARoster">
+                    <!-- Заполняется динамически -->
+                </tbody>
+            </table>
+            
+            <div class="coach-row">
+                Главный тренер: <input type="text" id="coachA" class="coach-input" placeholder="Фамилия Имя Отчество">
+            </div>
+        </div>
+
+        <!-- Команда Б -->
+        <div class="team-section">
+            <div class="team-header team-b-header">
+                <span>Команда (Б)</span>
+                <span id="teamBName">КОМАНДА "Б"</span>
+            </div>
+            
+            <table class="roster-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">№</th>
+                        <th rowspan="2">Фамилия Имя</th>
+                        <th rowspan="2">К/А</th>
+                        <th rowspan="2">Поз</th>
+                        <th rowspan="2">Игр</th>
+                        <th colspan="6">Взятие ворот</th>
+                        <th colspan="6">Удаления</th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Время</th>
+                        <th>Г</th>
+                        <th>А1</th>
+                        <th>А2</th>
+                        <th>И/С</th>
+                        <th>Время</th>
+                        <th>№</th>
+                        <th>Мин</th>
+                        <th>Нарушение</th>
+                        <th>Нач</th>
+                        <th>Окон</th>
+                    </tr>
+                </thead>
+                <tbody id="teamBRoster">
+                    <!-- Заполняется динамически -->
+                </tbody>
+            </table>
+            
+            <div class="coach-row">
+                Главный тренер: <input type="text" id="coachB" class="coach-input" placeholder="Фамилия Имя Отчество">
+            </div>
+        </div>
+
+        <!-- Статистика игроков -->
+        <div class="player-stats-protocol">
+            <h3><i class="fas fa-chart-line"></i> Статистика игроков</h3>
+            <div class="stats-tables">
+                <div class="stats-column">
+                    <h4 id="statsTeamATitle">Команда А</h4>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Игрок</th>
+                                <th>Г</th>
+                                <th>П</th>
+                                <th>Штр</th>
+                                <th>О</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTeamA">
+                            <!-- Заполняется динамически -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="stats-column">
+                    <h4 id="statsTeamBTitle">Команда Б</h4>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Игрок</th>
+                                <th>Г</th>
+                                <th>П</th>
+                                <th>Штр</th>
+                                <th>О</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTeamB">
+                            <!-- Заполняется динамически -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Результаты и статистика вратарей -->
+        <div class="bottom-section">
+            <div class="results-section">
+                <h3><i class="fas fa-list-ol"></i> Результат по периодам</h3>
+                <table class="results-table">
+                    <tr>
+                        <th>Период</th>
+                        <th>Взятие ворот</th>
+                        <th>Штрафы Время</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="score-input" id="p1Score"></td>
+                        <td><input type="text" class="score-input" id="p1Penalty"></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><input type="text" class="score-input" id="p2Score"></td>
+                        <td><input type="text" class="score-input" id="p2Penalty"></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><input type="text" class="score-input" id="p3Score"></td>
+                        <td><input type="text" class="score-input" id="p3Penalty"></td>
+                    </tr>
+                    <tr>
+                        <td>ОТ</td>
+                        <td><input type="text" class="score-input" id="otScore"></td>
+                        <td><input type="text" class="score-input" id="otPenalty"></td>
+                    </tr>
+                    <tr>
+                        <td>Б/П</td>
+                        <td><input type="text" class="score-input" id="soScore"></td>
+                        <td><input type="text" class="score-input" id="soPenalty"></td>
+                    </tr>
+                    <tr>
+                        <th>Общий</th>
+                        <th><input type="text" class="score-input" id="totalScore"></th>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="goalies-section">
+                <h3><i class="fas fa-shield-alt"></i> Статистика вратарей</h3>
+                <table class="goalie-table">
+                    <thead>
+                        <tr>
+                            <th>Команда</th>
+                            <th>№</th>
+                            <th>Вратарь</th>
+                            <th>Бр</th>
+                            <th>ПШ</th>
+                            <th>ОБр</th>
+                            <th>%ОБр</th>
+                            <th>КН</th>
+                            <th>ВП</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goaliesTable">
+                        <!-- Заполняется динамически -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Подписи -->
+        <div class="signatures">
+            <div>
+                Главный судья: <input type="text" id="mainRef" placeholder="Фамилия И.О.">
+            </div>
+            <div>
+                Главный судья: <input type="text" id="mainRef2" placeholder="Фамилия И.О.">
+            </div>
+            <div>
+                Замечания: <input type="text" id="notes" placeholder="Особые отметки">
+            </div>
+            <div style="text-align: right;">
+                Дата составления: <input type="text" id="signDate" placeholder="дд.мм.гггг">
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно импорта CSV -->
+    <div id="csvModal" class="modal csv-modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-file-import"></i> Импорт составов команд</h2>
+            
+            <div class="csv-section">
+                <h3><i class="fas fa-user-friends"></i> Команда А</h3>
+                <textarea id="csvTeamA" placeholder="Формат CSV:
+Номер,Фамилия Имя,Позиция
+30,Ханнанов Артур,Вр
+9,Сирогин Максим,Защ
+Примеры позиций: Вр, Защ, Нап, Ц, Л, П"></textarea>
+                <button onclick="processCSV('A')" class="btn-confirm">
+                    <i class="fas fa-upload"></i> Загрузить команду А
+                </button>
+            </div>
+            
+            <div class="csv-section">
+                <h3><i class="fas fa-user-friends"></i> Команда Б</h3>
+                <textarea id="csvTeamB" placeholder="Формат CSV:
+Номер,Фамилия Имя,Позиция
+1,Иванов Петр,Вр
+5,Сидоров Иван,Нап
+Примеры позиций: Вр, Защ, Нап, Ц, Л, П"></textarea>
+                <button onclick="processCSV('B')" class="btn-confirm">
+                    <i class="fas fa-upload"></i> Загрузить команду Б
+                </button>
+            </div>
+            
+            <button onclick="closeCSVModal()" class="btn-cancel" style="width: 100%; margin-top: 15px;">
+                <i class="fas fa-times"></i> Закрыть
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Дополнительные инициализации
+        document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем текущую дату в поле даты
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('matchDate');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = today;
+            }
+            
+            // Устанавливаем текущее время
+            const now = new Date();
+            const timeInput = document.getElementById('matchTime');
+            if (timeInput && !timeInput.value) {
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                timeInput.value = `${hours}:${minutes}`;
+            }
+            
+            // Устанавливаем дату подписания
+            const signDate = document.getElementById('signDate');
+            if (signDate && !signDate.value) {
+                const formattedDate = now.toLocaleDateString('ru-RU');
+                signDate.value = formattedDate;
+            }
+            
+            // Проверяем и загружаем сохраненный логотип
+            const savedLogo = localStorage.getItem('hockeyLogo');
+            if (savedLogo) {
+                const logoImage = document.getElementById('logoImage');
+                const logoEmoji = document.getElementById('logoEmoji');
+                if (logoImage && logoEmoji) {
+                    logoImage.src = savedLogo;
+                    logoImage.style.display = 'block';
+                    logoEmoji.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

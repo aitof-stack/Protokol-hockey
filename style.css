@@ -1,0 +1,1658 @@
+/* Основные стили с улучшениями */
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #48bb78;
+    --danger-color: #e53e3e;
+    --warning-color: #d69e2e;
+    --info-color: #4299e1;
+    --dark-color: #2d3748;
+    --light-color: #f7fafc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Панель инструментов - улучшенная версия */
+.toolbar {
+    background: white;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    position: sticky;
+    top: 15px;
+    z-index: 100;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: rgba(74, 85, 104, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(74, 85, 104, 0.1);
+}
+
+.protocol-navigation {
+    min-width: 200px;
+}
+
+.nav-btn {
+    background: #4a5568;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background: #2d3748;
+    transform: scale(1.05);
+}
+
+.protocol-counter {
+    font-weight: 600;
+    margin: 0 10px;
+    min-width: 100px;
+    text-align: center;
+    color: var(--dark-color);
+    font-size: 13px;
+}
+
+/* Кнопки - улучшенные стили */
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-new-protocol {
+    background: linear-gradient(135deg, var(--success-color) 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-duplicate {
+    background: linear-gradient(135deg, var(--info-color) 0%, #3182ce 100%);
+    color: white;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c53030 100%);
+    color: white;
+}
+
+.btn-export-file {
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    color: white;
+}
+
+.btn-import-file {
+    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+    color: white;
+}
+
+.btn-backup {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.btn-statistics {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+    color: white;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    color: white;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+    color: white;
+}
+
+.btn-load {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+}
+
+.btn-live {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.btn-import {
+    background: linear-gradient(135deg, #4fd1c7 0%, #319795 100%);
+    color: white;
+}
+
+/* Поля ввода в тулбаре */
+.toolbar input,
+.toolbar select {
+    padding: 7px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 13px;
+    min-width: 110px;
+    background: white;
+    transition: border-color 0.2s;
+}
+
+.toolbar input:focus,
+.toolbar select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Панель живого матча - улучшенная */
+.live-panel {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.team-score {
+    text-align: center;
+    flex: 1;
+}
+
+.team-score h2 {
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.score {
+    font-size: 36px;
+    font-weight: 700;
+    color: #48bb78;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.timer-section {
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+}
+
+.period {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #cbd5e0;
+}
+
+.timer {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 8px 0;
+    font-family: 'Courier New', monospace;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 15px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.timer-controls button {
+    background: #4a5568;
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.timer-controls button:hover {
+    background: #2d3748;
+    transform: scale(1.1);
+}
+
+/* Панель активных штрафов */
+.active-penalties-panel {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+}
+
+.active-penalties-panel h3 {
+    margin-bottom: 12px;
+    color: var(--dark-color);
+    text-align: center;
+    font-size: 16px;
+}
+
+.penalties-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.penalty-team {
+    flex: 1;
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.penalty-team h4 {
+    margin-bottom: 10px;
+    color: #4a5568;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.penalty-list {
+    min-height: 50px;
+}
+
+.penalty-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.penalty-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.penalty-player {
+    font-weight: 600;
+    color: var(--dark-color);
+    flex: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.penalty-time {
+    background: #ed8936;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 11px;
+    margin: 0 4px;
+}
+
+.penalty-minutes {
+    background: #cbd5e0;
+    color: var(--dark-color);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.no-penalties {
+    text-align: center;
+    color: #a0aec0;
+    font-style: italic;
+    padding: 15px 0;
+    font-size: 12px;
+}
+
+/* Панель действий */
+.action-panel {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    flex: 1;
+    min-width: 100px;
+    max-width: 150px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.penalty-shot-btn { 
+    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%); 
+}
+.penalty-btn { 
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); 
+}
+.goal-btn-a { 
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); 
+}
+.goal-btn-b { 
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); 
+}
+
+/* Панель вратарей */
+.goalies-panel {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.goalie-control {
+    flex: 1;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.goalie-control h4 {
+    margin-bottom: 8px;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.goalie-info {
+    margin: 8px 0;
+}
+
+.goalie-info select {
+    width: 100%;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+}
+
+.goalie-stats-live {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.goalie-stats-live span {
+    flex: 1;
+    min-width: 60px;
+    text-align: center;
+    background: #edf2f7;
+    padding: 4px 3px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+}
+
+.goalie-stats-live strong {
+    color: var(--dark-color);
+    font-weight: 700;
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* Лог событий */
+.events-log {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.events-log h3 {
+    margin-bottom: 10px;
+    color: var(--dark-color);
+    font-size: 16px;
+}
+
+.event-item {
+    padding: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 4px;
+    font-size: 12px;
+    background: white;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.event-item:hover {
+    background: #f7fafc;
+}
+
+.event-item.goal {
+    border-left: 3px solid var(--success-color);
+}
+
+.event-item.penalty {
+    border-left: 3px solid var(--danger-color);
+}
+
+.event-item.penalty-shot {
+    border-left: 3px solid var(--warning-color);
+}
+
+.event-item.goalie {
+    border-left: 3px solid var(--info-color);
+}
+
+.event-time {
+    color: #718096;
+    font-weight: 600;
+    margin-right: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+.event-description {
+    color: #4a5568;
+    flex: 1;
+}
+
+.event-item small {
+    color: #a0aec0;
+    font-size: 10px;
+    float: right;
+}
+
+/* Основной протокол */
+.protocol {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    background: #f7fafc;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.header-center {
+    text-align: center;
+    flex: 1;
+    padding: 0 20px;
+}
+
+.header-center h1 {
+    color: var(--dark-color);
+    margin-bottom: 4px;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+#logoImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    width: auto;
+    height: auto;
+}
+
+#logoEmoji {
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.tournament-type {
+    color: #718096;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.match-info {
+    text-align: right;
+    color: #4a5568;
+    font-size: 13px;
+}
+
+.match-details {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-row span {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.detail-row input {
+    padding: 4px 6px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    flex: 1;
+    font-size: 12px;
+    min-width: 0;
+}
+
+/* Таблицы протокола */
+.team-section {
+    margin-bottom: 25px;
+    page-break-inside: avoid;
+}
+
+.team-header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.roster-table th,
+.roster-table td {
+    border: 1px solid #cbd5e0;
+    padding: 5px 6px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.roster-table th {
+    background: #edf2f7;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 10px;
+}
+
+.roster-table input {
+    width: 100%;
+    padding: 3px 4px;
+    border: 1px solid #cbd5e0;
+    border-radius: 3px;
+    font-size: 10px;
+    height: 22px;
+    text-align: center;
+}
+
+.roster-table input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2);
+}
+
+.coach-row {
+    background: #f7fafc;
+    padding: 8px;
+    border: 1px solid #cbd5e0;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    text-align: right;
+    font-size: 12px;
+}
+
+.coach-input {
+    width: 200px;
+    padding: 4px 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+/* Статистика игроков */
+.player-stats-protocol {
+    margin-bottom: 20px;
+}
+
+.player-stats-protocol h3 {
+    margin-bottom: 10px;
+    color: var(--dark-color);
+    font-size: 16px;
+}
+
+.stats-tables {
+    display: flex;
+    gap: 25px;
+}
+
+.stats-column {
+    flex: 1;
+}
+
+.stats-column h4 {
+    margin-bottom: 8px;
+    color: #4a5568;
+    font-size: 14px;
+    text-align: center;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+
+.stats-table th,
+.stats-table td {
+    border: 1px solid #cbd5e0;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 11px;
+}
+
+.stats-table th {
+    background: #edf2f7;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.player-name-col {
+    text-align: left;
+    min-width: 120px;
+}
+
+/* Нижняя секция */
+.bottom-section {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.results-section,
+.goalies-section {
+    flex: 1;
+}
+
+.results-section h3,
+.goalies-section h3 {
+    margin-bottom: 10px;
+    color: var(--dark-color);
+    font-size: 16px;
+}
+
+.results-table,
+.goalie-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+.results-table th,
+.results-table td,
+.goalie-table th,
+.goalie-table td {
+    border: 1px solid #cbd5e0;
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.results-table th,
+.goalie-table th {
+    background: #edf2f7;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 10px;
+}
+
+.score-input {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 11px;
+    height: 24px;
+}
+
+/* Таблица вратарей */
+.goalie-table td input {
+    width: 100%;
+    padding: 3px 4px;
+    border: 1px solid #cbd5e0;
+    border-radius: 3px;
+    font-size: 10px;
+    text-align: center;
+    height: 22px;
+}
+
+/* Подписи */
+.signatures {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 2px solid #e2e8f0;
+    color: #4a5568;
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.signatures > div {
+    flex: 1;
+    min-width: 200px;
+}
+
+.signatures input {
+    padding: 4px 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 350px;
+    max-width: 450px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-content label {
+    display: block;
+    margin: 8px 0 4px;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.modal-content select,
+.modal-content input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    background: white;
+}
+
+.modal-content select:focus,
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, var(--success-color) 0%, #38a169 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1;
+}
+
+.btn-cancel {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c53030 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1;
+}
+
+/* Дисплей ситуации */
+.situation-display {
+    background: #e6fffa;
+    border: 1px solid #81e6d9;
+    border-radius: 5px;
+    padding: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.situation-display strong {
+    color: var(--dark-color);
+}
+
+#currentSituationText {
+    color: #2c7a7b;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* Модальное окно CSV */
+.csv-modal .modal-content {
+    min-width: 500px;
+    max-width: 600px;
+}
+
+.csv-section {
+    margin-bottom: 15px;
+}
+
+.csv-section h3 {
+    margin-bottom: 8px;
+    color: #4a5568;
+    font-size: 14px;
+    text-align: left;
+}
+
+.csv-section textarea {
+    width: 100%;
+    height: 120px;
+    padding: 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 5px;
+    margin: 5px 0 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    resize: vertical;
+    background: #f8fafc;
+}
+
+.csv-section textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+}
+
+.csv-section button {
+    background: var(--info-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    width: 100%;
+}
+
+/* Буллиты */
+.shootout-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.shootout-team {
+    text-align: center;
+    flex: 1;
+}
+
+.shootout-score-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-top: 5px;
+}
+
+.shootout-info {
+    flex: 2;
+    text-align: center;
+    font-size: 12px;
+    color: #4a5568;
+}
+
+.shootout-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.btn-shootout {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.btn-shootout:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-shootout.goal {
+    background: linear-gradient(135deg, var(--success-color) 0%, #38a169 100%);
+}
+
+.btn-shootout.miss {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c53030 100%);
+}
+
+.btn-finish-shootout {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #b7791f 100%);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+
+.btn-finish-shootout:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для меню управления файлами */
+.file-management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.file-management-btn {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 90px;
+}
+
+.file-management-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-management-btn.export {
+    background: linear-gradient(135deg, var(--info-color) 0%, #3182ce 100%);
+}
+
+.file-management-btn.import {
+    background: linear-gradient(135deg, var(--success-color) 0%, #38a169 100%);
+}
+
+.file-management-btn.backup {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.file-management-btn.merge {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+}
+
+.file-management-btn .icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+.file-management-btn .text {
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.file-management-btn small {
+    font-size: 10px;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toolbar-group {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .penalties-container,
+    .goalies-panel {
+        flex-direction: column;
+    }
+    
+    .bottom-section,
+    .stats-tables {
+        flex-direction: column;
+    }
+    
+    .signatures {
+        flex-direction: column;
+    }
+    
+    .signatures > div {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .toolbar {
+        padding: 10px;
+    }
+    
+    .toolbar input,
+    .toolbar select {
+        min-width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .action-panel {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        max-width: 100%;
+    }
+    
+    .roster-table {
+        font-size: 10px;
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .roster-table th,
+    .roster-table td {
+        padding: 4px 5px;
+        min-width: 40px;
+    }
+    
+    .file-management-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .csv-modal .modal-content {
+        min-width: 90%;
+        margin: 10px;
+    }
+    
+    .modal-content {
+        min-width: 90%;
+        margin: 10px;
+    }
+    
+    .scoreboard {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .timer-section {
+        order: -1;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .header-center {
+        padding: 0;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-confirm,
+    .btn-cancel {
+        width: 100%;
+    }
+    
+    .shootout-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Стили для печати */
+@media print {
+    .toolbar,
+    .live-panel {
+        display: none !important;
+    }
+    
+    .protocol {
+        box-shadow: none;
+        padding: 10px !important;
+        margin: 0 !important;
+    }
+    
+    .roster-table {
+        font-size: 10px !important;
+    }
+    
+    .roster-table th,
+    .roster-table td {
+        padding: 3px 4px !important;
+        height: 18px !important;
+    }
+    
+    .roster-table input {
+        border: 1px solid #ccc !important;
+        background: transparent !important;
+        height: 16px !important;
+        font-size: 10px !important;
+    }
+    
+    .team-section {
+        page-break-inside: avoid !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .stats-table th,
+    .stats-table td {
+        padding: 4px 5px !important;
+        font-size: 10px !important;
+    }
+    
+    .goalie-table th,
+    .goalie-table td {
+        padding: 4px 5px !important;
+        font-size: 10px !important;
+    }
+    
+    body {
+        background: white !important;
+        padding: 5px !important;
+    }
+}
+
+/* Утилитарные классы */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.flex {
+    display: flex;
+}
+
+.grid {
+    display: grid;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-sm {
+    font-size: 12px;
+}
+
+.text-xs {
+    font-size: 11px;
+}
+
+.text-lg {
+    font-size: 16px;
+}
+
+.text-xl {
+    font-size: 20px;
+}
+
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-5 { margin-bottom: 20px; }
+
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.p-5 { padding: 20px; }
+
+.rounded {
+    border-radius: 6px;
+}
+
+.rounded-lg {
+    border-radius: 8px;
+}
+
+.shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.shadow-lg {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.bg-light {
+    background: var(--light-color);
+}
+
+.bg-white {
+    background: white;
+}
+
+.border {
+    border: 1px solid #e2e8f0;
+}
+
+.border-b {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.border-t {
+    border-top: 1px solid #e2e8f0;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.h-full {
+    height: 100%;
+}
+
+/* Добавьте в конец файла style.css */
+
+/* Анимация появления панели матча */
+.live-panel {
+    animation: slideDown 0.3s ease;
+    transform-origin: top center;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стиль активной кнопки */
+.btn-live.active {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+}
+
+/* Улучшенный вид панели матча */
+.live-panel {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: white;
+    border: 2px solid #4a5568;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.live-panel h3 {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.live-panel .scoreboard {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #48bb78;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.live-panel .timer {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #4299e1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
+}
+
+.live-panel .action-btn {
+    transition: all 0.3s;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.live-panel .action-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 20px; }
+
+/* Стили для страницы статистики */
+.statistics-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.statistics-link .btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    font-weight: 600;
+}
+
+.statistics-link .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* Стили для отображения удалений на табло */
+.scoreboard-container {
+    position: relative;
+}
+
+.penalties-display {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 80px;
+    overflow-y: auto;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+#penaltiesDisplayA {
+    left: 10px;
+    bottom: 10px;
+}
+
+#penaltiesDisplayB {
+    right: 10px;
+    bottom: 10px;
+}
+
+.penalty-on-scoreboard {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    background: #333;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+    border-left: 3px solid #ff4444;
+}
+
+.penalty-on-scoreboard .penalty-number {
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.penalty-on-scoreboard .penalty-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
+.penalty-on-scoreboard .penalty-time {
+    font-family: monospace;
+    color: #ff4444;
+    font-weight: bold;
+}
+
+.no-penalties {
+    color: #999;
+    font-size: 11px;
+    font-style: italic;
+    padding: 5px;
+}
